@@ -1,0 +1,6 @@
+fastapi[standard]
+pydantic
+pydantic[email, timezone]
+sqlalchemy
+psycopg2-binary
+uvicorn
