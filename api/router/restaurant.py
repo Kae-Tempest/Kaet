@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 
-from Database.Schema import restaurantSchema
-from Dependencies.dependencies import db_dependency
-from Model import restaurantModel
+from database.schema import restaurant_schema
+from dependencies.dependencies import db_dependency
+from model import restaurant_model
 
 router = APIRouter(
     prefix="/restaurants",
@@ -10,9 +10,9 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=restaurantModel.Restaurant)
-async def create_restaurant(restaurant: restaurantModel.RestaurantBase, db: db_dependency):
-    db_restaurant = restaurantSchema.Restaurant.from_pydantic(restaurant)
+@router.post("/", response_model=restaurant_model.Restaurant)
+async def create_restaurant(restaurant: restaurant_model.RestaurantBase, db: db_dependency):
+    db_restaurant = restaurant_schema.Restaurant.from_pydantic(restaurant)
     try:
         db.add(db_restaurant)
         db.commit()
@@ -24,17 +24,17 @@ async def create_restaurant(restaurant: restaurantModel.RestaurantBase, db: db_d
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/{restaurant_id}", response_model=restaurantModel.Restaurant)
+@router.get("/{restaurant_id}", response_model=restaurant_model.Restaurant)
 async def get_restaurant(restaurant_id: int, db: db_dependency):
-    db_restaurant = db.query(restaurantSchema.Restaurant).get(restaurant_id)
+    db_restaurant = db.query(restaurant_schema.Restaurant).get(restaurant_id)
     if not db_restaurant:
         raise HTTPException(status_code=404, detail="Restaurant not found")
     return db_restaurant
 
 
-@router.put("/{restaurant_id}", response_model=restaurantModel.Restaurant)
-async def update_restaurant(restaurant_id: int, restaurant: restaurantModel.RestaurantBase, db: db_dependency):
-    db_restaurant = db.query(restaurantSchema.Restaurant).get(restaurant_id)
+@router.put("/{restaurant_id}", response_model=restaurant_model.Restaurant)
+async def update_restaurant(restaurant_id: int, restaurant: restaurant_model.RestaurantBase, db: db_dependency):
+    db_restaurant = db.query(restaurant_schema.Restaurant).get(restaurant_id)
     if not db_restaurant:
         raise HTTPException(status_code=404, detail="Restaurant not found")
 
@@ -44,13 +44,13 @@ async def update_restaurant(restaurant_id: int, restaurant: restaurantModel.Rest
     return db_restaurant
 
 
-@router.patch("/{restaurant_id}", response_model=restaurantModel.Restaurant)
+@router.patch("/{restaurant_id}", response_model=restaurant_model.Restaurant)
 async def patch_restaurant(
         restaurant_id: int,
-        restaurant: restaurantModel.RestaurantPatch,
+        restaurant: restaurant_model.RestaurantPatch,
         db: db_dependency
 ):
-    db_restaurant = db.query(restaurantSchema.Restaurant).get(restaurant_id)
+    db_restaurant = db.query(restaurant_schema.Restaurant).get(restaurant_id)
     if not db_restaurant:
         raise HTTPException(status_code=404, detail="Restaurant not found")
 
@@ -62,7 +62,7 @@ async def patch_restaurant(
 
 @router.delete("/{restaurant_id}", response_model=dict)
 async def delete_restaurant(restaurant_id: int, db: db_dependency):
-    db_restaurant = db.query(restaurantSchema.Restaurant).get(restaurant_id)
+    db_restaurant = db.query(restaurant_schema.Restaurant).get(restaurant_id)
     if not db_restaurant:
         raise HTTPException(status_code=404, detail="Restaurant not found")
 

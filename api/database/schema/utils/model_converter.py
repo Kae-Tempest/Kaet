@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
+
 class ModelConverter:
     @classmethod
     def from_pydantic(cls, pydantic_model: BaseModel):

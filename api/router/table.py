@@ -1,8 +1,7 @@
+from database.schema import table_schema
+from dependencies.dependencies import db_dependency
+from model import table_model
 from fastapi import APIRouter, HTTPException
-
-from Database.Schema import tableSchema
-from Dependencies.dependencies import db_dependency
-from Model import tableModel
 
 router = APIRouter(
     prefix="/tables",
@@ -10,9 +9,9 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=tableModel.Table)
-async def create_table(table: tableModel.TableBase, db: db_dependency):
-    db_table = tableSchema.Table.from_pydantic(table)
+@router.post("/", response_model=table_model.Table)
+async def create_table(table: table_model.TableBase, db: db_dependency):
+    db_table = table_schema.Table.from_pydantic(table)
     try:
         db.add_table(db_table)
         db.commit()
@@ -24,17 +23,17 @@ async def create_table(table: tableModel.TableBase, db: db_dependency):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/{table_id}", response_model=tableModel.Table)
+@router.get("/{table_id}", response_model=table_model.Table)
 async def get_table(table_id: int, db: db_dependency):
-    db_table = db.query(tableSchema.Table).get(table_id)
+    db_table = db.query(table_schema.Table).get(table_id)
     if not db_table:
         raise HTTPException(status_code=404, detail="Table not found")
     return db_table
 
 
-@router.put("/{table_id}", response_model=tableModel.Table)
-async def get_table(table_id: int, table: tableModel.TableBase, db: db_dependency):
-    db_table = db.query(tableSchema.Table).get(table_id)
+@router.put("/{table_id}", response_model=table_model.Table)
+async def get_table(table_id: int, table: table_model.TableBase, db: db_dependency):
+    db_table = db.query(table_schema.Table).get(table_id)
     if not db_table:
         raise HTTPException(status_code=404, detail="Table not found")
 
@@ -43,9 +42,10 @@ async def get_table(table_id: int, table: tableModel.TableBase, db: db_dependenc
     db.refresh(db_table)
     return db_table
 
-@router.patch("/{table_id}", response_model=tableModel.Table)
-async def update_table(table_id: int, table: tableModel.TableBase, db: db_dependency):
-    db_table = db.query(tableSchema.Table).get(table_id)
+
+@router.patch("/{table_id}", response_model=table_model.Table)
+async def update_table(table_id: int, table: table_model.TableBase, db: db_dependency):
+    db_table = db.query(table_schema.Table).get(table_id)
     if not db_table:
         raise HTTPException(status_code=404, detail="Table not found")
     db_table.patch_from_pydantic(table)
@@ -53,9 +53,10 @@ async def update_table(table_id: int, table: tableModel.TableBase, db: db_depend
     db.refresh(db_table)
     return db_table
 
+
 @router.delete("/{table_id}", response_model=dict)
 async def delete_table(table_id: int, db: db_dependency):
-    db_table = db.query(tableSchema.Table).get(table_id)
+    db_table = db.query(table_schema.Table).get(table_id)
     if not db_table:
         raise HTTPException(status_code=404, detail="Table not found")
 
