@@ -1,8 +1,9 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 
-from ..Connector.connector import Base
-from .Utils.TimestampMixin import TimestampMixin
-from .Utils.ModelConverter import ModelConverter
+from .utils.model_converter import ModelConverter
+from .utils.timestamp_mixin import TimestampMixin
+from ..connector.connector import Base
+
 
 class User(Base, TimestampMixin, ModelConverter):
     __tablename__ = 'users'

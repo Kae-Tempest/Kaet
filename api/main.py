@@ -1,15 +1,15 @@
 from fastapi import FastAPI
 
-from Database.Connector.connector import engine
-from Database.Schema import restaurantSchema, userSchema, tableSchema, reservationSchema
-from Router import restaurant, table, reservation, user
+from database.connector.connector import engine
+from database.schema import restaurant_schema, user_schema, table_schema, reservation_schema
+from router import restaurant, table, reservation, user
 
 app = FastAPI()
 # ORM create DB Begin
-restaurantSchema.Base.metadata.create_all(bind=engine)
-userSchema.Base.metadata.create_all(bind=engine)
-tableSchema.Base.metadata.create_all(bind=engine)
-reservationSchema.Base.metadata.create_all(bind=engine)
+restaurant_schema.Base.metadata.create_all(bind=engine)
+user_schema.Base.metadata.create_all(bind=engine)
+table_schema.Base.metadata.create_all(bind=engine)
+reservation_schema.Base.metadata.create_all(bind=engine)
 # ORM create DB End
 
 app.include_router(restaurant.router)

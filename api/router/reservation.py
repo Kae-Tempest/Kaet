@@ -1,16 +1,17 @@
+from database.schema import reservation_schema
+from dependencies.dependencies import db_dependency
+from model import reservation_model
 from fastapi import APIRouter, HTTPException
-from Dependencies.dependencies import db_dependency
-from Model import reservationModel
-from Database.Schema import reservationSchema
 
 router = APIRouter(
     prefix="/reservations",
     tags=["reservations"]
 )
 
-@router.post("/", response_model=reservationModel.Reservation)
-async def create_reservation(reservation: reservationModel.ReservationBase, db: db_dependency):
-    db_reservation = reservationSchema.Reservation.from_pydantic(reservation)
+
+@router.post("/", response_model=reservation_model.Reservation)
+async def create_reservation(reservation: reservation_model.ReservationBase, db: db_dependency):
+    db_reservation = reservation_schema.Reservation.from_pydantic(reservation)
     try:
         db.add(db_reservation)
         db.commit()
@@ -21,16 +22,17 @@ async def create_reservation(reservation: reservationModel.ReservationBase, db: 
         raise
 
 
-@router.get("/{reservation_id}", response_model=reservationModel.Reservation)
+@router.get("/{reservation_id}", response_model=reservation_model.Reservation)
 async def get_reservations(reservation_id, db: db_dependency):
-    db_reservation = db.query(reservationModel.Reservation).get(reservation_id)
+    db_reservation = db.query(reservation_model.Reservation).get(reservation_id)
     if not db_reservation:
         raise HTTPException(status_code=404, detail="Reservation not found")
     return db_reservation
 
-@router.put("/{reservation_id}", response_model=reservationModel.Reservation)
-async def update_reservation(reservation_id: int,reservation: reservationModel.ReservationBase, db: db_dependency):
-    db_reservation = db.query(reservationModel.Reservation).get(reservation_id)
+
+@router.put("/{reservation_id}", response_model=reservation_model.Reservation)
+async def update_reservation(reservation_id: int, reservation: reservation_model.ReservationBase, db: db_dependency):
+    db_reservation = db.query(reservation_model.Reservation).get(reservation_id)
     if not db_reservation:
         raise HTTPException(status_code=404, detail="Reservation not found")
 
@@ -39,9 +41,10 @@ async def update_reservation(reservation_id: int,reservation: reservationModel.R
     db.refresh(db_reservation)
     return db_reservation
 
-@router.patch("/{reservation_id}", response_model=reservationModel.Reservation)
-async def update_reservation(reservation_id: int,reservation: reservationModel.ReservationBase, db: db_dependency):
-    db_reservation = db.query(reservationModel.Reservation).get(reservation_id)
+
+@router.patch("/{reservation_id}", response_model=reservation_model.Reservation)
+async def update_reservation(reservation_id: int, reservation: reservation_model.ReservationBase, db: db_dependency):
+    db_reservation = db.query(reservation_model.Reservation).get(reservation_id)
     if not db_reservation:
         raise HTTPException(status_code=404, detail="Reservation not found")
 
@@ -50,9 +53,10 @@ async def update_reservation(reservation_id: int,reservation: reservationModel.R
     db.refresh(db_reservation)
     return db_reservation
 
+
 @router.delete("/{reservation_id}", response_model=dict)
 async def delete_reservation(reservation_id: int, db: db_dependency):
-    db_reservation = db.query(reservationModel.Reservation).get(reservation_id)
+    db_reservation = db.query(reservation_model.Reservation).get(reservation_id)
     if not db_reservation:
         raise HTTPException(status_code=404, detail="Reservation not found")
 
