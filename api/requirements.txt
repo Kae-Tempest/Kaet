@@ -4,3 +4,4 @@ pydantic[email, timezone]
 sqlalchemy
 psycopg2-binary
 uvicorn
+alembic
