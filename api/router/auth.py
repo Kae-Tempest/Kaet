@@ -1,8 +1,7 @@
 from datetime import timedelta, datetime, UTC
-from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Depends
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr
@@ -17,15 +16,18 @@ router = APIRouter(
     tags=["auth"]
 )
 
+
 class Token(BaseModel):
     access_token: str
     token_type: str
+
 
 SECRET_KEY = "JESUISUNESECRETKEYHYPERSECRET"
 ALGORITHM = "HS256"
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
+
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register(create_user_request: user_model.UserCreate, db: db_dependency):
@@ -44,8 +46,9 @@ async def register(create_user_request: user_model.UserCreate, db: db_dependency
         db.rollback()
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
-@router.post("/token", response_model=Token)
-async def login_for_access_token(form_data: user_model.UserFormToken, db: db_dependency):
+
+@router.post("/login", response_model=Token)
+async def login_for_access_token(form_data: user_model.UserLogin, db: db_dependency):
     user = authenticate_user(form_data.email, form_data.password, db)
     if not user or not bcrypt_context.verify(form_data.password, user.password):
         raise HTTPException(status_code=401, detail="Could not validate user")
@@ -60,14 +63,16 @@ def authenticate_user(email: EmailStr, password: str, db: db_dependency):
         return False
     return user
 
+
 def create_access_token(user: user_model.User, expires_delta: timedelta):
     encode = {'sub': user.email, 'id': user.id}
     expire = datetime.now(UTC) + expires_delta
     encode.update({'exp': expire})
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
 
+
 # TODO : deplacer dans dependencie, Creer le .env avec SecretKey et encrypteType et verifier si ca fonctionne bien
-async def get_current_user(token: str = Depends(oauth2_bearer), db = db_dependency):
+async def get_current_user(token: str = Depends(oauth2_bearer), db=db_dependency):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
