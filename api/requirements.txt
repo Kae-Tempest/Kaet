@@ -5,3 +5,6 @@ sqlalchemy
 psycopg2-binary
 uvicorn
 alembic
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from fastapi.security import OAuth2PasswordBearer
 
 from database.schema import user_schema
 from dependencies.dependencies import db_dependency
@@ -8,23 +9,6 @@ router = APIRouter(
     prefix="/users",
     tags=["users"]
 )
-
-
-# TODO: Add Login
-# TODO: rework for correct register
-@router.post("/", response_model=user_model.User)
-async def create(user: user_model.UserBase, db: db_dependency):
-    db_user = user_schema.User.from_pydantic(user)
-    try:
-        db.add(db_user)
-        db.commit()
-        db.refresh(db_user)
-        return db_user
-    except Exception as e:
-        print("Error details: ", str(e))
-        db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
-
 
 @router.get("/{user_id}", response_model=user_model.User)
 async def get_by_id(user_id: int, db: db_dependency):
