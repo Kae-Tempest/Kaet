@@ -1,7 +1,8 @@
+from fastapi import APIRouter, HTTPException
+
 from database.schema import reservation_schema
 from dependencies.dependencies import db_dependency
 from model import reservation_model
-from fastapi import APIRouter, HTTPException
 
 router = APIRouter(
     prefix="/reservations",
@@ -20,6 +21,14 @@ async def create_reservation(reservation: reservation_model.ReservationBase, db:
         print("Error details:", str(e))
         db.rollback()
         raise
+
+
+@router.get("/", response_model=list[reservation_model.Reservation])
+async def get_reservations(db: db_dependency):
+    db_reservation = db.query(reservation_model.Reservation).all()
+    if not db_reservation:
+        raise HTTPException(status_code=404, detail="Reservation not found")
+    return db_reservation
 
 
 @router.get("/{reservation_id}", response_model=reservation_model.Reservation)

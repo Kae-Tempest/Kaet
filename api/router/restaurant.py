@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from sqlalchemy import select
 
 from database.schema import restaurant_schema
 from dependencies.dependencies import db_dependency
@@ -23,6 +24,12 @@ async def create_restaurant(restaurant: restaurant_model.RestaurantBase, db: db_
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/", response_model=list[restaurant_model.Restaurant])
+async def get_restaurant(db: db_dependency):
+    db_restaurants = db.query(restaurant_schema.Restaurant).all()
+    if not db_restaurants:
+        raise HTTPException(status_code=404, detail="Restaurant not found")
+    return db_restaurants
 
 @router.get("/{restaurant_id}", response_model=restaurant_model.Restaurant)
 async def get_restaurant(restaurant_id: int, db: db_dependency):
